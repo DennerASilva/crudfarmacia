@@ -34,9 +34,9 @@ public class ProdutoModel {
 	@Size(min = 5, max = 50, message = "O campo Composto Químico deve ter no mínimo 5 e no máximo 50 caracteres")
 	private String composto;
 	
-	@NotBlank
-	@Size(min = 8, max = 8, message = "O campo Nome deve ter 8 caracteres e ser dos seguintes valores: original ou genérico.")
-	private String autenticidade;
+	@ManyToOne
+	@JsonIgnoreProperties("produto")
+	private AutenticidadeModel autenticidade;
 	
 	@ManyToOne
 	@JsonIgnoreProperties("produto")
@@ -74,12 +74,17 @@ public class ProdutoModel {
 		this.composto = composto;
 	}
 
-	public String getAutenticidade() {
+
+	public AutenticidadeModel getAutenticidade() {
 		return autenticidade;
 	}
 
-	public void setAutenticidade(String autenticidade) {
+	public void setAutenticidade(AutenticidadeModel autenticidade) {
 		this.autenticidade = autenticidade;
+	}
+
+	public int getQuantidade() {
+		return quantidade;
 	}
 
 	public void setQuantidade(int quantidade) {

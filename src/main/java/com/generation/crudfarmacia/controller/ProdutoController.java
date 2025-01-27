@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.generation.crudfarmacia.model.ProdutoModel;
+import com.generation.crudfarmacia.repository.AutenticidadeRepository;
 import com.generation.crudfarmacia.repository.CategoriaRepository;
 import com.generation.crudfarmacia.repository.ProdutoRepository;
 
@@ -34,6 +35,9 @@ public class ProdutoController {
 
 	@Autowired
 	private CategoriaRepository categoriaRepository;
+
+	@Autowired
+	private AutenticidadeRepository autenticidadeRepository;
 
 	@GetMapping("/all")
 	public ResponseEntity<List<ProdutoModel>> getAll() {
@@ -63,12 +67,16 @@ public class ProdutoController {
 	@PutMapping("/atualizar")
 	public ResponseEntity<ProdutoModel> putProduto(@Valid @RequestBody ProdutoModel produto ) {
 		
-		if (categoriaRepository.existsById(produto.getCategoria().getId()))
-			return produtoRepository.findById(produto.getId())
-					.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto)))
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-							"O produto não foi encontrado"));
-		throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Categoria inexistente.");
+		if (!(autenticidadeRepository.existsById(produto.getAutenticidade().getId())))
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Autenticidade inexistente.");
+		if (!(categoriaRepository.existsById(produto.getCategoria().getId())))
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Categoria inexistente.");
+		
+		return produtoRepository.findById(produto.getId())
+				.map(resposta -> ResponseEntity.status(HttpStatus.OK).body(produtoRepository.save(produto)))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+						"O produto não foi encontrado"));
+		
 	}
 
 	@ResponseStatus(HttpStatus.NO_CONTENT)
